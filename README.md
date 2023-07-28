@@ -1,6 +1,7 @@
 # automatic-papasburgeria
 Use Python to automatically play papasburgeria  
 MUST USE IN A 1920*1080 display,  USE FLASH PLAYER and MAX THE WINDOW.USE ORIGIN GAME FILE.  
+DOWNLOAD ALL THE PICTURE AND PUT IT IN E:\PAPA\full for code to recognize.
 change dayNum in code to change state.  
 if you are using exe file or dayNum is 1,then you should have at least one empty save slot to skip the instruction in game  
 uploading recognition picture in order to better run the code. Owned by the company.  
