@@ -7,7 +7,7 @@ filenames = os.listdir('E:\\PAPA\\full')
 root = 'E:\\PAPA\\full'
 print("脚本已启动！")
 
-ham = [-1 for a in range(9)]
+ham = [12 for a in range(9)]
 ticket = [1000 for b in range(10)]
 meatLoc = [0 for c in range(24)]
 foodStr = ["汉堡顶", "西红柿", "生菜", "洋葱卷", "黄瓜", "芝士", "汉堡底", "", "", "", "红酱", "黄酱", "白酱", "棕酱",
@@ -27,7 +27,7 @@ meatY_delta = 167
 xPosition = 975
 yPosition = 450
 orderNum = 0
-dayNum = 70
+dayNum = 89
 baseTime = 15
 dayBegin = False
 
@@ -113,7 +113,7 @@ def orderNeed():
     continueBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\continue.png', confidence=0.95)
     if continueBox != None:
         return False
-    orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\order.png', confidence=0.90)
+    orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\order.png', confidence=0.89, region=(550, 320, 240, 190))
     if orderBox != None:
         print("找到页面中Order")
         return True
@@ -132,7 +132,8 @@ def orderCheck():
     pyautogui.click(655, 415)
     print("正在接受点餐")
 
-def grillRoutine(num):
+def grillRoutine(num, dayState):
+    global orderNum
     stationClick(1)
     line = 2
     if num == 21:
@@ -140,11 +141,74 @@ def grillRoutine(num):
     for i in range(3):
         for j in range(line):
             dragMeatOn(i, j)
-    time.sleep(baseTime*(num-19) - line * 3 * 0.69)
+    startSec = time.time()
+    timeDelta = 0
+    if dayState == 0:
+        stationClick(0)
+        if orderNeed():
+            orderCheck()
+            # print("???")
+            while True:
+                time.sleep(0.1)
+                orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
+                # print("order?")
+                if orderBox != None:
+                    for i in range(10):
+                        print("ticket", ticket[i])
+                    for i in range(10):
+                        if ticket[i] == 1000:
+                            ticket[i] = orderNum
+                            dragTicket(i)
+                            break
+                    orderNum = orderNum + 1
+                    break
+            timeDelta = time.time() - startSec
+            print("timeDelta", timeDelta)
+        else:
+            timeDelta = 0
+
+    else:
+        timeDelta = 0
+    print("timeDelta-1", timeDelta)
+    sleepTime1 = baseTime*(num-19) - line * 3 * 0.69 - timeDelta
+    print("sleepTime1", sleepTime1)
+    if sleepTime1 > 0.3:
+        time.sleep(sleepTime1)
+    stationClick(1)
+
     for i in range(3):
         for j in range(line):
             rotationMeat(i, j)
-    time.sleep(baseTime*(num-19) - line * 3 * 0.8)
+
+    startSec = time.time()
+    timeDelta = 0
+    if dayState == 0:
+        stationClick(0)
+        if orderNeed():
+            orderCheck()
+            while True:
+                time.sleep(0.1)
+                orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
+                if orderBox != None:
+                    for i in range(10):
+                        if ticket[i] == 1000:
+                            ticket[i] = orderNum
+                            dragTicket(i)
+                            break
+                    orderNum = orderNum + 1
+                    break
+            timeDelta = time.time() - startSec
+        else:
+            timeDelta = 0
+    else:
+        timeDelta = 0
+    print("timeDelta-2", timeDelta)
+    sleepTime2 = baseTime * (num - 19) - line * 3 * 0.69 - timeDelta
+    print("sleepTime2", sleepTime2)
+    if sleepTime2 > 0.3:
+        time.sleep(sleepTime2)
+    stationClick(1)
+
     for i in range(3):
         for j in range(line):
             dragMeatOff(i, j)
@@ -166,7 +230,7 @@ def dragThing(num):
             print(str(num) + "  " + str(meatLoc[j]))
             if meatLoc[j] == 0:
                 print("j", j)
-                grillRoutine(num)
+                grillRoutine(num, 1)
                 time.sleep(0.2)
                 stationClick(2)
                 pyautogui.moveTo(690, 888 - j * 28, duration=0.1)
@@ -200,20 +264,15 @@ def buildRoutine():
     starttime = time.time()
     recognizeThing()
     print("time5", time.time() - starttime)
+    ham[8] = 0
     for i in range(9):
-        if ham[i] == -1:
-            if ham[i-1] == 0:
-                break
-            else:
-                dragThing(0)
-                print("识别出现错误，直接出餐")
-                time.sleep(0.5)
-                break
+        if ham[i] == 0:
+            break
         dragThing(ham[i])
         print("获取到食物" + foodStr[ham[i]])
         time.sleep(0.2)
     for i in range(9):
-        ham[i] = -1
+        ham[i] = 12
     dragTicketOrder()
     time.sleep(10)
     stationClick(0)
@@ -283,16 +342,21 @@ while True:
     if dayBegin:
         print("今天是第" + str(dayNum) + "天")
         dayBegin = False
+        orderNum = 0
         if dayNum == 1:
             baseTime = baseTime / 2
         if dayNum == 2:
             baseTime = baseTime * 2
+        if dayNum >= 2:
+            for grill in range(3):
+                grillRoutine(grill + 20, 0)
+                print("grill", grill)
 
     if orderNeed():
         orderCheck()
         while True:
             time.sleep(0.1)
-            orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.92)
+            orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
             if orderBox != None:
                 for i in range(10):
                     if ticket[i] == 1000:
@@ -304,6 +368,9 @@ while True:
         for i in range(24):
             print(meatLoc[i])
         time.sleep(0.6)
-        buildRoutine()
+    for tic in range(10):
+        if ticket[tic] != 1000:
+            buildRoutine()
+
 
     time.sleep(0.1)
