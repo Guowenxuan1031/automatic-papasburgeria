@@ -28,7 +28,7 @@ meatY_delta = 167
 xPosition = 975
 yPosition = 450
 orderNum = 0
-dayNum = 197
+dayNum = 222
 baseTime = 16
 dayBegin = False
 
@@ -43,16 +43,16 @@ def stationClick(num):
 def dragMeatOn(row, line):
     xpoint = meatX_origin + row * meatX_delta
     ypoint = meatY_origin + line * meatY_delta
-    pyautogui.moveTo(400, 700, duration=0.15)
-    pyautogui.dragTo(xpoint, ypoint, duration=0.15)
+    pyautogui.moveTo(400, 700, duration=0.05)
+    pyautogui.dragTo(xpoint, ypoint, duration=0.1)
     print("将烤肉移到第" + str(row + 1) + "行，第" + str(line + 1) + "列，时间为" + str(time.time()))
 
 
 def dragMeatOff(row, line):
     xpoint = meatX_origin + row * meatX_delta
     ypoint = meatY_origin + line * meatY_delta
-    pyautogui.moveTo(xpoint, ypoint, duration=0.15)
-    pyautogui.dragTo(1445, 300, duration=0.15)
+    pyautogui.moveTo(xpoint, ypoint, duration=0.05)
+    pyautogui.dragTo(1445, 300, duration=0.1)
     print("将第" + str(row + 1) + "行，第" + str(line + 1) + "列烤肉移出，时间为" + str(time.time()))
 
 
@@ -61,7 +61,6 @@ def rotationMeat(row, line):
     ypoint = meatY_origin + line * meatY_delta
     pyautogui.click(xpoint, ypoint)
     print("将第" + str(row + 1) + "行，第" + str(line + 1) + "列烤肉翻面，时间为" + str(time.time()))
-    time.sleep(0.695)
 
 foodName1 = ["hamberger-up-pink.png", "tomato-pink.png", "vegetable-pink.png", "onion-pink.png", "cucumber-pink.png",
              "cheese-pink.png", "hamberger-down-pink.png", "", "", "", "redsauce-pink.png", "yellowsauce-pink.png",
@@ -93,21 +92,21 @@ def recognizeThing():
 
 def dragTicket(num):
     xpoint = 457 + num * 75  # 457-909
-    pyautogui.moveTo(1440, 150, duration=0.2)
-    pyautogui.dragTo(xpoint, 90, duration=0.2)
+    pyautogui.moveTo(1440, 150, duration=0.05)
+    pyautogui.dragTo(xpoint, 90, duration=0.1)
     print("将小票拖到第" + str(num + 1) + "位")
 
 
 def dragTicketOn(num):
     xpoint = 457 + num * 75  # 457-909
-    pyautogui.moveTo(xpoint, 90, duration=0.2)
-    pyautogui.dragTo(1440, 150, duration=0.2)
+    pyautogui.moveTo(xpoint, 90, duration=0.05)
+    pyautogui.dragTo(1440, 150, duration=0.1)
     print("将第" + str(num + 1) + "位小票拖至位置")
 
 
 def dragTicketOrder():
-    pyautogui.moveTo(1440, 150, duration=0.2)
-    pyautogui.dragTo(694, 700, duration=0.2)
+    pyautogui.moveTo(1440, 150, duration=0.15)
+    pyautogui.dragTo(694, 700, duration=0.1)
 
 
 def orderNeed():
@@ -153,7 +152,7 @@ def grillRoutine(num, dayState):
                 time.sleep(0.1)
                 orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
                 # print("order?")
-                print("orderNum", orderNum)
+                # print("orderNum", orderNum)
                 if orderBox != None:
                     recognizeThing()
 
@@ -181,27 +180,30 @@ def grillRoutine(num, dayState):
     else:
         timeDelta = 0
     print("timeDelta-1", timeDelta)
-    sleepTime1 = baseTime*(num-19) - line * 3 * 0.69 - timeDelta
-    startSec = time.time()
-    ticketRec = 1000
-    ticketOrd = 1100
-    if sleepTime1 > 20:
+    # sleepTime1 = baseTime*(num-19) - line * 3 * 0.69 - timeDelta
+    sleepTime1 = baseTime*(num-19) - timeDelta
+
+    while sleepTime1 > 15:
+        startSec = time.time()
+        ticketRec = 1000
+        ticketOrd = 1100
+        # if sleepTime1 > 15:
         for m in range(10):
             for l in range(24):
-                print(ticRec[m], meatLoc[l])
+                # print(ticRec[m], meatLoc[l])
                 if ticRec[m] == meatLoc[l]:
                     if ticketOrd > ticket[m]:
                         ticketOrd = ticket[m]
                         ticketRec = m
                     break
-        print(ticketRec)
+        # print(ticketRec)
         if ticketRec != 1000:
             buildRoutine(ticketRec)
-    sleepTime1 = sleepTime1 - (time.time() - startSec)
+        else:
+            time.sleep(1)
+        sleepTime1 = sleepTime1 - (time.time() - startSec)
+        print("sleepTime1", sleepTime1)
 
-
-
-    print("sleepTime1", sleepTime1)
     if sleepTime1 > 0.3:
         time.sleep(sleepTime1)
     stationClick(1)
@@ -244,24 +246,28 @@ def grillRoutine(num, dayState):
     else:
         timeDelta = 0
     print("timeDelta-2", timeDelta)
-    sleepTime2 = baseTime * (num - 19) - line * 3 * 0.69 - timeDelta
-    startSec = time.time()
-    ticketRec = 1000
-    ticketOrd = 1100
-    if sleepTime2 > 20:
+    # sleepTime2 = baseTime * (num - 19) - line * 3 * 0.69 - timeDelta
+    sleepTime2 = baseTime * (num - 19) - timeDelta
+    while sleepTime2 > 15:
+        startSec = time.time()
+        ticketRec = 1000
+        ticketOrd = 1100
+    # if sleepTime2 > 15:
         for m in range(10):
             for l in range(24):
-                print(ticRec[m], meatLoc[l])
+                # print(ticRec[m], meatLoc[l])
                 if ticRec[m] == meatLoc[l]:
                     if ticketOrd > ticket[m]:
                         ticketOrd = ticket[m]
                         ticketRec = m
                     break
-        print(ticketRec)
+        # print(ticketRec)
         if ticketRec != 1000:
             buildRoutine(ticketRec)
-    sleepTime2 = sleepTime2 - (time.time() - startSec)
-    print("sleepTime2", sleepTime2)
+        else:
+            time.sleep(1)
+        sleepTime2 = sleepTime2 - (time.time() - startSec)
+        print("sleepTime2", sleepTime2)
     if sleepTime2 > 0.3:
         time.sleep(sleepTime2)
     stationClick(1)
@@ -302,7 +308,7 @@ def dragThing(num):
                 meatLoc[23] = 0
                 break
     print("drag!")
-    pyautogui.dragTo(xPosition, yPosition, duration=0.1)
+    pyautogui.dragTo(xPosition, yPosition, duration=0.06)
 
 
 def buildRoutine(buildState):
