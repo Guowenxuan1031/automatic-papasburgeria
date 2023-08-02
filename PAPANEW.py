@@ -28,8 +28,8 @@ meatY_delta = 167
 xPosition = 975
 yPosition = 450
 orderNum = 0
-dayNum = 222
-baseTime = 16
+dayNum = 306
+baseTime = 16.5
 dayBegin = False
 
 def stationClick(num):
@@ -61,6 +61,10 @@ def rotationMeat(row, line):
     ypoint = meatY_origin + line * meatY_delta
     pyautogui.click(xpoint, ypoint)
     print("将第" + str(row + 1) + "行，第" + str(line + 1) + "列烤肉翻面，时间为" + str(time.time()))
+
+def deleteMeat(num):
+    pyautogui.moveTo(1450, 850 - num * 28, duration=0.05)
+    pyautogui.dragTo(440, 340, duration=0.1)
 
 foodName1 = ["hamberger-up-pink.png", "tomato-pink.png", "vegetable-pink.png", "onion-pink.png", "cucumber-pink.png",
              "cheese-pink.png", "hamberger-down-pink.png", "", "", "", "redsauce-pink.png", "yellowsauce-pink.png",
@@ -120,8 +124,15 @@ def orderNeed():
     else:
         return False
 
+def continueOn():
+    contibox = pyautogui.locateOnScreen('E:\\PAPA\\full\\continue.png', confidence=0.95)
+    if contibox != None:
+        return True
+    else:
+        return False
 
-def orderCheck():
+
+def orderRoutine(orderSitu):
     global orderNum
     for i in range(10):
         if ticket[i] == 1000:
@@ -131,6 +142,28 @@ def orderCheck():
             return
     pyautogui.click(655, 415)
     print("正在接受点餐")
+    while True:
+        time.sleep(0.1)
+        orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
+        if orderBox != None:
+            if orderSitu == 1:
+                recognizeThing()
+            for i in range(10):
+                print("ticket", ticket[i])
+                print("ticRec", ticRec[i])
+            for i in range(10):
+                if ticket[i] == 1000:
+                    ticket[i] = orderNum
+                    dragTicket(i)
+                    for k in range(9):
+                        print("ham", ham[k])
+                        if ham[k] >= 20:
+                            if ticRec[i] != ham[k]:
+                                ticRec[i] = ticRec[i] + ham[k] + 1
+                        ham[k] = 12
+                    break
+            orderNum = orderNum + 1
+            break
 
 def grillRoutine(num, dayState):
     global orderNum
@@ -138,6 +171,11 @@ def grillRoutine(num, dayState):
     line = 2
     if num == 21:
         line = 4
+
+
+
+
+
     for i in range(3):
         for j in range(line):
             dragMeatOn(i, j)
@@ -146,32 +184,7 @@ def grillRoutine(num, dayState):
     if dayState == 0:
         stationClick(0)
         if orderNeed():
-            orderCheck()
-            # print("???")
-            while True:
-                time.sleep(0.1)
-                orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
-                # print("order?")
-                # print("orderNum", orderNum)
-                if orderBox != None:
-                    recognizeThing()
-
-                    for i in range(10):
-                        print("ticket", ticket[i])
-                        print("ticRec", ticRec[i])
-                    for i in range(10):
-                        if ticket[i] == 1000:
-                            ticket[i] = orderNum
-                            dragTicket(i)
-                            for k in range(9):
-                                print("ham", ham[k])
-                                if ham[k] >= 20:
-                                    if ticRec[i] != ham[k]:
-                                        ticRec[i] = ticRec[i] + ham[k] + 1
-                                ham[k] = 12
-                            break
-                    orderNum = orderNum + 1
-                    break
+            orderRoutine(1)
             timeDelta = time.time() - startSec
             print("timeDelta", timeDelta)
         else:
@@ -183,7 +196,7 @@ def grillRoutine(num, dayState):
     # sleepTime1 = baseTime*(num-19) - line * 3 * 0.69 - timeDelta
     sleepTime1 = baseTime*(num-19) - timeDelta
 
-    while sleepTime1 > 15:
+    while sleepTime1 > 14:
         startSec = time.time()
         ticketRec = 1000
         ticketOrd = 1100
@@ -201,6 +214,8 @@ def grillRoutine(num, dayState):
             buildRoutine(ticketRec)
         else:
             time.sleep(1)
+            if orderNeed():
+                orderRoutine(1)
         sleepTime1 = sleepTime1 - (time.time() - startSec)
         print("sleepTime1", sleepTime1)
 
@@ -217,29 +232,7 @@ def grillRoutine(num, dayState):
     if dayState == 0:
         stationClick(0)
         if orderNeed():
-            orderCheck()
-            while True:
-                time.sleep(0.1)
-                orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
-                if orderBox != None:
-                    recognizeThing()
-
-                    for i in range(10):
-                        print("ticket", ticket[i])
-                        print("ticRec", ticRec[i])
-                    for i in range(10):
-                        if ticket[i] == 1000:
-                            ticket[i] = orderNum
-                            dragTicket(i)
-                            for k in range(9):
-                                print("ham", ham[k])
-                                if ham[k] >= 20:
-                                    if ticRec[i] != ham[k]:
-                                        ticRec[i] = ticRec[i] + ham[k] + 1
-                                ham[k] = 12
-                            break
-                    orderNum = orderNum + 1
-                    break
+            orderRoutine(1)
             timeDelta = time.time() - startSec
         else:
             timeDelta = 0
@@ -248,7 +241,7 @@ def grillRoutine(num, dayState):
     print("timeDelta-2", timeDelta)
     # sleepTime2 = baseTime * (num - 19) - line * 3 * 0.69 - timeDelta
     sleepTime2 = baseTime * (num - 19) - timeDelta
-    while sleepTime2 > 15:
+    while sleepTime2 > 14:
         startSec = time.time()
         ticketRec = 1000
         ticketOrd = 1100
@@ -266,12 +259,28 @@ def grillRoutine(num, dayState):
             buildRoutine(ticketRec)
         else:
             time.sleep(1)
+            if orderNeed():
+                orderRoutine(1)
         sleepTime2 = sleepTime2 - (time.time() - startSec)
         print("sleepTime2", sleepTime2)
     if sleepTime2 > 0.3:
         time.sleep(sleepTime2)
+    if continueOn():
+        return
     stationClick(1)
 
+    pyautogui.click(1450, 900)
+    time.sleep(0.2)
+    for removeNum in range(24):
+        for locLoop in range(24):
+            if meatLoc[removeNum] == num:
+                deleteMeat(removeNum)
+                for rem in range(23):
+                    if (rem >= removeNum):
+                        meatLoc[rem] = meatLoc[rem + 1]
+                meatLoc[23] = 0
+            else:
+                break
     for i in range(3):
         for j in range(line):
             dragMeatOff(i, j)
@@ -308,7 +317,7 @@ def dragThing(num):
                 meatLoc[23] = 0
                 break
     print("drag!")
-    pyautogui.dragTo(xPosition, yPosition, duration=0.06)
+    pyautogui.dragTo(xPosition, yPosition, duration=0.05)
 
 
 def buildRoutine(buildState):
@@ -416,23 +425,15 @@ while True:
         if dayNum == 2:
             baseTime = baseTime * 2
         if dayNum >= 2:
-            for grill in range(3):
-                grillRoutine(grill + 20, 0)
+            for grill in range(6):
+                grillRoutine((grill % 3) + 20, 0)
                 print("grill", grill)
+                contibox = pyautogui.locateOnScreen('E:\\PAPA\\full\\continue.png', confidence=0.95)
+                if contibox != None:
+                    break
 
     if orderNeed() & (orderNum < 10):
-        orderCheck()
-        while True:
-            time.sleep(0.1)
-            orderBox = pyautogui.locateOnScreen('E:\\PAPA\\full\\orderSign.png', confidence=0.90)
-            if orderBox != None:
-                for i in range(10):
-                    if ticket[i] == 1000:
-                        ticket[i] = orderNum
-                        dragTicket(i)
-                        break
-                orderNum = orderNum + 1
-                break
+        orderRoutine(0)
         for i in range(24):
             print(meatLoc[i])
         time.sleep(0.6)
